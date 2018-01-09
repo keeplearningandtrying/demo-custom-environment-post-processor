@@ -1,0 +1,27 @@
+## Custom `EnvironmentPostProcessor` demo
+This demo showcases how `EnvironmentPostProcessor` can be used to accommodate to advanced
+use cases. It is based on a
+https://github.com/spring-projects/spring-boot/issues/9902[feature request].
+
+`MailEnvironmentPostProcessor` is looking for OS env variables with a given name and map
+them to standard Spring Boot properties. If at least one is found a new `PropertySource`
+is added _after_ the `systemEnvironment` one.
+
+For instance, let's assume that the `ACME_MAIL_SMTP_STARTTLS_ENABLE` OS env variable is
+set. Using the `/env` endpoint, it is quite easy to figure out what happened:
+
+```json
+"systemEnvironment": {
+    "ACME_MAIL_SMTP_STARTTLS_ENABLE": "true",
+  },
+  "mailProperties": {
+    "spring.mail.properties.mail.smtp.starttls.enable": "true"
+  },
+  "applicationConfig: [classpath:/application.properties]": {
+    "management.security.enabled": "false"
+  }
+```
+
+Because the property sources are co-located, the usual precedence will work as it should (
+i.e. a property set higher in the list will effective override the OS env property even
+though their names don't match).
